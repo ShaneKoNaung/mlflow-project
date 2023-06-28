@@ -1,6 +1,6 @@
 # Duration Prediction for NYC Taxi 
 
-The purpose of this project is to practise MLops Tools taught in DataTalks Mlops zoomcamp.
+The purpose of this project is to practise MLOps Tools taught in DataTalks MlOps zoomcamp.
 
 ## Data
 
@@ -8,9 +8,9 @@ I am using the dataset from the NYC Taxi and Limousine Commission (TLC).
 We are going to predict the duration of the ride for the green taxi. 
 
 ### Download the dataset
-The dataset can be downloaded using download_green_taxi_data in preprocess.py.
+The dataset can be downloaded using **download_green_taxi_data** in preprocess.py.
 
-download_url function from fastdownload lib is used to download the dataset.
+**download_url** function from fastdownload lib is used to download the dataset.
 
 ```
 year = 2022
@@ -62,7 +62,7 @@ mlflow.set_experiment(experiment-name)
 ```
 
 ### Tracking runs using MLflow
-We can track specific data for each using mlflow.start_run(). We can set tags and log metric, param, artifacts and models.
+We can track specific data for each using **mlflow.start_run()**. We can set tags and log metric, param, artifacts and models.
 
 ```
 def objective(params: dict) -> dict:
@@ -159,3 +159,4 @@ mlflow server --backend-store-uri=sqlite:///mlflow.db
 - datatalks mlops zoomcamp mlflow chapter - https://github.com/DataTalksClub/mlops-zoomcamp/tree/main/02-experiment-tracking
 - mlflow docs - https://mlflow.org/docs/latest/index.html
 - TLC Trip Record Data - https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+- fastdownload docs - https://fastdownload.fast.ai/
