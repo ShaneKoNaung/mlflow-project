@@ -62,8 +62,84 @@ mlflow server --backend-store-uri=sqlite:///mlflow.db
 ```
 
 ### Tracking runs using MLflow
+
+#### mlflow.start_run()
+
 We can track specific data for each using **mlflow.start_run()**. We can set tags and log metric, param, artifacts and models.
 
+```
+with mlflow.start_run():
+    # training code
+    ...
+
+```
+
+#### Setting Tags 
+
+We can also assign tags to the run by using **set_tag**.
+
+```
+mlflow.set_tag("developer", "shane")
+```
+
+#### Logging Parameters
+
+We can log parameters using **log_param** or **log_params**.
+```
+mlflow.log_param({"alpha", 0.1})
+
+params = {
+        'learning_rate': 0.09585355369315604,
+        'max_depth': 30,
+        'min_child_weight': 1.060597050922164,
+        'objective': 'reg:linear',
+        'reg_alpha': 0.018060244040060163,
+        'reg_lambda': 0.011658731377413597,
+        'seed': 42
+    }
+
+mlflow.log_params(params)
+```
+
+#### log metric
+
+We can also log metrics using **log_metric**.
+```
+mlflow.log_metric("rmse", rmse)
+```
+
+#### log artifacts
+
+We can log a single artifact using  **log_artifact** and we can log a folder of artifacts using **log_artifacts**.
+
+```
+mlflow.log_artifact("models/preprocessor.b", artifact_path="artifacts")
+
+
+mlflow.log_artifacts("models", artifact_path="artifacts")
+
+```
+
+#### logging models
+
+here is how we can log models for specific lib.
+
+```
+# for sklearn model
+
+from mlflow.models.signature import infer_signature
+
+signature = infer_signature(X, model.predict(X))
+mlflow.sklearn.log_model(model, artifact_path="models", signature=signature)
+
+
+# for xgboost model
+signature = infer_signature(X_test, y_preds)
+mlflow.xgboost.log_model(booster, artifact_path="model", signature=signature)
+
+```
+
+We can see the whole thing here. 
 ```
 def objective(params: dict) -> dict:
 
@@ -92,12 +168,12 @@ def objective(params: dict) -> dict:
 
 
         mlflow.log_metric("rmse", rmse)
-        mlflow.xgboost.log_model()
 
         signature = infer_signature(X_test, y_preds)
         mlflow.xgboost.log_model(booster, artifact_path="model", signature=signature)
 ```
 
+### Auto Logging
 We can also use auto logging for tracking. 
 MLflow supports autolog for various machine learning and deep learning libs.
 
