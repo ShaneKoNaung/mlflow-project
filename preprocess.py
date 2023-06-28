@@ -4,6 +4,17 @@ from sklearn.feature_extraction import DictVectorizer
 import scipy
 import pickle
 
+from fastdownload import download_url
+
+def check_data(data : Path) -> bool:
+    return data.exists()
+
+def download_green_taxi_data(year : int, month : int, dest : Path) -> None:
+    
+    url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_{year:04d}-{month:02d}.parquet"
+    download_url(url, dest)
+
+
 def read_dataframe(filename: Path) -> pd.DataFrame:
     df = pd.read_parquet(filename)
 
