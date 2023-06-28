@@ -33,7 +33,7 @@ def train_xgboost(X_train : scipy.sparse._csr.csr_matrix,
                 y_train : scipy.sparse._csr.csr_matrix, 
                 X_val : scipy.sparse._csr.csr_matrix, 
                 y_val : scipy.sparse._csr.csr_matrix,
-                params: dict):
+                params: dict) -> xgb.core.Booster:
 
     with mlflow.start_run() as run:
 
