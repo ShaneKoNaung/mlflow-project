@@ -21,24 +21,6 @@ download_green_taxi_data(year, month, dest)
 
 ```
 
-## Train
-
-train.py is used for training the model.
-
-```
-# Train Lasso model using scikit-learn lib
-python train.py lasso 
-
-# Train xgboost model using Xgboost lib
-python train.py xgboost
-
-# Train xgboost model after performing hypyerparameter tuning using hyperopt lib
-python train.py xgboost_hopt
-
-# Train both Lasso model and xgboost model with hyperparameter tuning
-python train.py all
-```
-
 ## Experiment Tracking using MLflow
 For experiment tracking purpose, I am using mlflow. The very purpose of this porject is to practise MLflow for experiment tracking. 
 
@@ -59,6 +41,24 @@ If we don't set a name for experiment, mlflow will store data under default expe
 ```
 mlflow.set_tracking_uri("http://127.0.0.1:5000")
 mlflow.set_experiment(experiment-name)
+```
+
+## MLflow UI and Server
+
+If we are tracking experiments locally, we can use **mlflow ui** to access the dashboard.
+
+```
+#bash
+
+# locally
+mlflow ui 
+
+# locally with sqlite database
+mlflow ui --backend-store-uri=sqlite:///mlflow.db
+
+# using mlflow server
+mlflow server --backend-store-uri=sqlite:///mlflow.db
+
 ```
 
 ### Tracking runs using MLflow
@@ -136,22 +136,24 @@ def train_linear_sklearn(model : linear_model ,X_train : scipy.sparse._csr.csr_m
     return lr
 ```
 
-## MLflow UI
 
-If we are tracking experiments locally, we can use **mlflow ui** to access the dashboard.
+
+## Train
+
+train.py is used for training the model.
 
 ```
-#bash
+# Train Lasso model using scikit-learn lib
+python train.py lasso 
 
-# locally
-mlflow ui 
+# Train xgboost model using Xgboost lib
+python train.py xgboost
 
-# locally with sqlite database
-mlflow ui --backend-store-uri=sqlite:///mlflow.db
+# Train xgboost model after performing hypyerparameter tuning using hyperopt lib
+python train.py xgboost_hopt
 
-# using mlflow server
-mlflow server --backend-store-uri=sqlite:///mlflow.db
-
+# Train both Lasso model and xgboost model with hyperparameter tuning
+python train.py all
 ```
 
 ## References
