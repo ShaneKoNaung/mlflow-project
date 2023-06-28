@@ -5,6 +5,8 @@ from pathlib import Path
 
 from preprocess import read_dataframe, process_features, save_pickle
 
+from hopt import run_optimization
+
 from argparse import ArgumentParser
 
 import scipy
@@ -17,6 +19,7 @@ def train_linear_sklearn(model : linear_model ,X_train : scipy.sparse._csr.csr_m
                          X_val : scipy.sparse._csr.csr_matrix, 
                          y_val : scipy.sparse._csr.csr_matrix) -> linear_model:
     
+    mlflow.sklearn.autolog()
     with mlflow.start_run() as run:
 
         mlflow.set_tag("Developer", "Shane")
@@ -36,6 +39,8 @@ def train_linear_sklearn(model : linear_model ,X_train : scipy.sparse._csr.csr_m
         print(f"RMSE : {rmse}")
 
         mlflow.log_metric("rmse", rmse)
+        mlflow.log_artifact("models/preprocessor.b", artifact_path="artifacts")
+
 
     return lr
 
@@ -44,36 +49,42 @@ def train_xgboost(X_train : scipy.sparse._csr.csr_matrix,
                 y_train : scipy.sparse._csr.csr_matrix, 
                 X_val : scipy.sparse._csr.csr_matrix, 
                 y_val : scipy.sparse._csr.csr_matrix,
-                params: dict) -> xgb.core.Booster:
-
+                params: dict = {}) -> xgb.core.Booster:
+    mlflow.xgboost.autolog()
     with mlflow.start_run() as run:
 
         mlflow.set_tag("Developer", "Shane")
 
 
         train = xgb.DMatrix(X_train, label=y_train)
-        valid = xgb.DMatrix(X_val, label=y_train)
+        valid = xgb.DMatrix(X_val, label=y_val)
+
 
         booster = xgb.train(
             params=params,
             dtrain=train,
             num_boost_round=1000,
             evals=[(valid, "validation")],
-            early_stopping_round=50
+            early_stopping_rounds=50
         )
 
         y_pred = booster.predict(valid)
         rmse = mean_squared_error(y_val, y_pred, squared=False)
 
         mlflow.log_metric("rmse", rmse)
+        mlflow.log_artifact("models/preprocessor.b", artifact_path="artifacts")
+
+        print(f"Xgboost RMSE : {rmse}")
 
     return booster
 
 
 if __name__ == "__main__":
 
+    mlflow.set_experiment("NYC-Green-Taxi")
+
     parser = ArgumentParser()
-    parser.add_argument("model", choices=["lasso", "xgboost"])
+    parser.add_argument("model", choices=["lasso", "xgboost", "xgboost_hopt", "all"])
     args = parser.parse_args()
 
     model_type = args.model
@@ -94,9 +105,17 @@ if __name__ == "__main__":
 
 
 
-    if model_type == "lasso":
+    if model_type == "lasso" or model_type == "all":
         model = linear_model.Lasso  
 
         model = train_linear_sklearn(model, X_train, y_train, X_val, y_val)
 
+    if model_type == "xgboost":
+
+        model = train_xgboost(X_train, y_train, X_val, y_val)
+    
+    if model_type == "xgboost_hopt" or model_type == "all":
+        best_result = run_optimization()
+        print(best_result)
+        model = train_xgboost(X_train, y_train, X_val, y_val, best_result)
         
