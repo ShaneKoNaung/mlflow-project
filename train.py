@@ -1,11 +1,12 @@
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
 
+from preprocess import check_data
+
 import scipy
-
 import xgboost as xgb
-
 import mlflow
+
 
 def train_linear_sklearn(model : linear_model ,X_train : scipy.sparse._csr.csr_matrix, 
                          y_train : scipy.sparse._csr.csr_matrix, 
@@ -57,3 +58,11 @@ def train_xgboost(X_train : scipy.sparse._csr.csr_matrix,
         mlflow.log_metric("rmse", rmse)
 
     return booster
+
+
+if __name__ == "__main__":
+
+    year = args.year
+    month = args.month
+
+    if check_data()
