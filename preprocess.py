@@ -7,6 +7,7 @@ import pickle
 from fastdownload import download_url
 
 def check_data(data : Path) -> bool:
+    print(f"Checking Data {data}")
     return data.exists()
 
 def download_green_taxi_data(year : int, month : int, dest : Path) -> None:
@@ -32,20 +33,20 @@ def read_dataframe(filename: Path) -> pd.DataFrame:
     return df
 
 
-def process_features(df, dv, valid=False) -> tuple(scipy.sparse._csr.csr_matrix, scipy.sparse._csr.csr_matrix):
+def process_features(df : pd.DataFrame, dv : DictVectorizer = None) -> tuple((scipy.sparse._csr.csr_matrix, scipy.sparse._csr.csr_matrix)):
     df['PU_DO'] = df['PULocationID'] + '_' + df['DOLocationID']
     categorical = ['PU_DO'] #'PULocationID', 'DOLocationID']
     numerical = ['trip_distance']
 
     target = 'duration'
     
-    if valid:
+    if dv is None:
         dv = DictVectorizer()
         train_dicts = df[categorical + numerical].to_dict(orient='records')
         X_train = dv.fit_transform(train_dicts)
         y_train = df[target].values
 
-        return (X_train, y_train)
+        return (dv, X_train, y_train)
 
     else:
 
