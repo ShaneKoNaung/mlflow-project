@@ -55,14 +55,11 @@ def process_features(df : pd.DataFrame, dv : DictVectorizer = None) -> tuple((sc
         y_val = df[target].values
 
         return (X_val, y_val)
-    
-
 def save_pickle(model, output):
     with open(output, 'wb') as f_out:
         pickle.dump(model, f_out)
 
 def load_pickle(file : Path):
-    
     with open(file, 'rb') as f_in:
         model = pickle.load(f_in)
 
