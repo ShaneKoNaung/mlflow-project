@@ -177,6 +177,10 @@ def objective(params: dict) -> dict:
 We can also use auto logging for tracking. 
 MLflow supports autolog for various machine learning and deep learning libs.
 
+```
+mlflow.<framework>.autolog()
+```
+
 In order to use auto log for sklearn model, we can use **mlflow.sklearn.autolog()**.
 
 ```
@@ -238,9 +242,22 @@ python train.py all
 For loading model, we only need the run_id of the model.
 
 ```
-run_id = f""
+import mlflow
 
+MLFLOW_TRAKING_URI = "sqlite:///mlflow.db"
+mlflow.set_tracking_uri(MLFLOW_TRAKING_URI)
 
+run_id = "fa6503255f8548d6bd25c8b76d076f13"
+
+logged_model = f'runs:/{run_id}/model'
+
+# Load model as a PyFuncModel.
+loaded_model = mlflow.pyfunc.load_model(logged_model)
+
+# preprocessing features
+X_test = ...
+
+predictions = loaded_model.predict(X_test)
 ```
 
 ## References
