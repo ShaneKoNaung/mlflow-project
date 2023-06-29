@@ -260,6 +260,109 @@ X_test = ...
 predictions = loaded_model.predict(X_test)
 ```
 
+
+# Model Register
+
+## Searching Experiments and Runs
+
+The mlflow.client module provides a Python CRUD interface to MLflow Experiments, Runs, Model Versions, and Registered Models. 
+
+### Search Experiments
+
+```
+from mlflow.tracking import MlflowClient
+
+MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
+
+client = MlflowClient(tracking_uri=MLFLOW_TRACKING_URI)
+
+client.search_experiments()
+
+out : [ <Experiment: artifact_location='/home/shane/mlflow-project/mlruns/1', creation_time=1687998653695, experiment_id='1', last_update_time=1687998653695, lifecycle_stage='active', name='NYC-Green-Taxi', tags={}>,
+        <Experiment: artifact_location='/home/shane/mlflow-project/mlruns/0', creation_time=1687998653682, experiment_id='0', last_update_time=1687998653682, lifecycle_stage='active', name='Default', tags={}>]
+```
+
+### Search runs
+
+We can search runs for each experiment using the experiment id.
+The runs can be filtered and ordered using filter_string and order_by.
+```
+from mlflow.entities import ViewType
+
+experiment_id = "1"
+
+runs = client.search_runs(
+                experiment_ids=experiment_id,
+                filter_string="metrics.rmse < 6.0",
+                run_view_type=ViewType.ACTIVE_ONLY,
+                max_results=5,
+                order_by=["metrics.rmse ASC"])
+
+
+for run in runs:
+    print(f"run_name : {run.info.run_name}")
+    print(f"run_id : {run.info.run_id}")
+    print(f"rmse : {run.data.metrics['rmse']}")
+
+out :   run_name : serious-finch-887
+        run_id : fa6503255f8548d6bd25c8b76d076f13
+        rmse : 5.818090066449871
+```
+
+## Register Model
+
+mlflow.register_model will create a new model if 'model_name' doesn't exist.
+It will register the model under the model_name.
+
+```
+import mlflow
+
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+
+run_id = "fa6503255f8548d6bd25c8b76d076f13"
+model_uri = f"runs:/{run_id}/model"
+
+model_name = "nyc-taxi-duration-prediction"
+
+mlflow.register_model(model_uri=model_uri, name=model_name)
+
+```
+
+## Model Stage Transition
+
+We can change the stage tag of the modelusing transition_model_version_stage.
+We can assign "Staging", "Production or "Archive".
+
+```
+model_version = version.version
+new_stage = "Staging"
+
+client.transition_model_version_stage(
+                    name=model_name,
+                    version=model_version,
+                    stage=new_stage,
+                    archive_existing_versions=False)
+
+
+out : <ModelVersion: aliases=[], creation_timestamp=1688006850748, current_stage='Staging', description=None, last_updated_timestamp=1688006967170, name='nyc-taxi-duration-prediction', run_id='fa6503255f8548d6bd25c8b76d076f13', run_link=None, source='/home/shane/mlflow-project/mlruns/1/fa6503255f8548d6bd25c8b76d076f13/artifacts/model', status='READY', status_message=None, tags={}, user_id=None, version=1>
+
+```
+
+## Add Model Description
+
+In this example, we can add description to the registered model.
+
+```
+from datetime import datetime
+
+date = datetime.today().date()
+
+client.update_model_version(
+        name=model_name,
+        version=model_version,
+        description=f"The model version {model_version} was transition to {new_stage} on {date}")
+```
+
 ## References
 
 - datatalks mlops zoomcamp mlflow chapter - https://github.com/DataTalksClub/mlops-zoomcamp/tree/main/02-experiment-tracking
