@@ -89,7 +89,7 @@ def train_xgboost(X_train : scipy.sparse._csr.csr_matrix,
 
 if __name__ == "__main__":
 
-    mlflow.set_tracking_uri("http://127.0.0.1:5000")
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
     mlflow.set_experiment("NYC-Green-Taxi")
 
     parser = ArgumentParser()

@@ -33,13 +33,13 @@ In Mlflow, tracking data and artifacts can be stored
     - using a SQLAlchemy-compatible database or 
     - using a tracking server
 
-In this project, I am tracking the experiment using a local server and sqlite database.
+In this project, I am tracking the experiment locally using sqlite database.
 
 After that, we can set the name of the experiment. MLflow will  create a new experiment if the experiment with this name doesn't exist.
 If we don't set a name for experiment, mlflow will store data under default experiment.
 
 ```
-mlflow.set_tracking_uri("http://127.0.0.1:5000")
+mlflow.set_tracking_uri("sqlite:///mlflow.db")
 mlflow.set_experiment(experiment-name)
 ```
 
@@ -230,6 +230,17 @@ python train.py xgboost_hopt
 
 # Train both Lasso model and xgboost model with hyperparameter tuning
 python train.py all
+```
+
+
+# Model Loading
+
+For loading model, we only need the run_id of the model.
+
+```
+run_id = f""
+
+
 ```
 
 ## References
