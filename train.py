@@ -12,6 +12,8 @@ from argparse import ArgumentParser
 import scipy
 import xgboost as xgb
 import mlflow
+from mlflow.models.signature import infer_signature
+
 
 
 def train_linear_sklearn(model : linear_model ,X_train : scipy.sparse._csr.csr_matrix, 
@@ -40,6 +42,9 @@ def train_linear_sklearn(model : linear_model ,X_train : scipy.sparse._csr.csr_m
 
         mlflow.log_metric("rmse", rmse)
         mlflow.log_artifact("models/preprocessor.b", artifact_path="artifacts")
+
+        signature = infer_signature(X_val, y_pred)
+        mlflow.sklearn.log_model(lr, artifact_path="models", signature=signature)
 
 
     return lr
@@ -75,6 +80,9 @@ def train_xgboost(X_train : scipy.sparse._csr.csr_matrix,
         mlflow.log_artifact("models/preprocessor.b", artifact_path="artifacts")
 
         print(f"Xgboost RMSE : {rmse}")
+
+        signature = infer_signature(X_val, y_pred)
+        mlflow.xgboost.log_model(booster, artifact_path="models", signature=signature)
 
     return booster
 
